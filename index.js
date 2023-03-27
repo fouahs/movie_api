@@ -1,4 +1,6 @@
-const express = require("express");
+const express = require("express"),
+    morgan = require("morgan");
+
 const app = express();
 
 let myLogger = (req, res, next) => {
@@ -11,8 +13,7 @@ let requestTime = (req, res, next) => {
   next();
 }
 
-app.use(myLogger);
-app.use(requestTime);
+app.use(morgan("common"));
 
 app.get("/", (req, res) => {
   let responseText = "Welcome to my app!";
