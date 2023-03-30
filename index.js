@@ -49,7 +49,7 @@ let movies = [
 let requestTime = (req, res, next) => {
   req.requestTime = Date.now();
   next();
-}
+};
 
 app.use(requestTime);
 
