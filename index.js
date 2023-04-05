@@ -12,42 +12,52 @@ app.use(morgan("common"));
 let movies = [
   {
     title: "The Lord of the Rings",
+    director: "Peter Jackson",
     year: 2001
   },
   {
     title: "Inception",
+    director: "Christopher Nolan",
     year: 2010
   },
   {
     title: "Matrix",
+    director: "The Wachowskis",
     year: 1999
   },
   {
     title: "The Dark Knight",
+    director: "Christopher Nolan",
     year: 2008
   },
   {
     title: "Star Wars",
+    director: "George Lucas",
     year: 1997
   },
   {
     title: "Interstellar",
+    director: "Christopher Nolan",
     year: 2014
   },
   {
     title: "The Green Mile",
+    director: "Frank Darabont",
     year: 1999
   },
   {
     title: "Spirited Away",
+    director: "Hayao Miyazaki",
     year: 2001
   },
   {
     title: "Gladiator",
+    director: "Ridley Scott",
     year: 2000
   },
   {
     title: "The Last Samurai",
+    director: "Edward Zwick",
     year: 2004
   },
 ];
