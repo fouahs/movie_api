@@ -7,6 +7,8 @@ const app = express();
 
 app.use(bodyParser.json());
 
+app.use(morgan("common"));
+
 let movies = [
   {
     title: "The Lord of the Rings",
@@ -37,7 +39,7 @@ let movies = [
     year: 1999
   },
   {
-    title: "Sprited Away",
+    title: "Spirited Away",
     year: 2001
   },
   {
@@ -50,47 +52,49 @@ let movies = [
   },
 ];
 
-app.use(morgan("common"));
-
 app.get("/", (req, res) => {
   res.send("Welcome to my app!\n");
 });
 
-// Gets the list of data about all movies
+app.get("/documentation", (req, res) => {
+  res.sendFile('public/documentation.html', { root: __dirname });
+});
+
 app.get('/movies', (req, res) => {
   res.json(movies);
 });
 
-// Gets the data about a single movie, by title
 app.get("/movies/:title", (req, res) => {
   res.json(movies.find((movie) =>
   { return movie.title === req.params.title }));
 });
 
-// Adds data for a new movie to our list of movies
-app.post('/movies', (req, res) => {
-  let newMovie = req.body;
-
-  if (!newMovie.title) {
-    const message = 'Missing title in request body';
-    res.status(400).send(message);
-  } else {
-    newMovie.id = uuid.v4();
-    movies.push(newMovie);
-    res.status(201).send(newMovie);
-  }
+app.get("/movies/genres/:name", (req, res) => {
+  res.send("Successful GET request returning data on a genre.");
 });
 
-// Deletes a movie from our list by title
-app.delete('/movies/:title', (req, res) => {
-  let movies = movies.find((movie) =>
-  { return movie.title === req.params.title });
+app.get("/movies/directors/:name", (req, res) => {
+  res.send("Successful GET request returning data on a director.");
+});
 
-  if (movies) {
-    movies = movies.filter((obj) =>
-    { return obj.title !== req.params.title });
-    res.status(201).send('Movie ' + req.params.title + ' was deleted.');
-  }
+app.post("/users", (req, res) => {
+  res.send("Successful POST request registering a new user.");
+});
+
+app.put("/users/:username", (req, res) => {
+  res.send("Successful PUT request updating a users's info.");
+});
+
+app.post("/users/:username/favorites", (req, res) => {
+  res.send("Successful POST request adding a movie to a user's list of favorites.");
+});
+
+app.delete("/users/:username/favorites", (req, res) => {
+  res.send("Successful DELETE request removing a movie from a user's list of favorites.");
+});
+
+app.delete("/users", (req, res) => {
+  res.send("Successful DELETE request deregistering a user.");
 });
 
 app.use(express.static("public"));
