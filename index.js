@@ -1,7 +1,11 @@
 const express = require("express"),
+    bodyParser = require("body-parser"),
+    uuid = require("uuid");
     morgan = require("morgan");
 
 const app = express();
+
+app.use(bodyParser.json());
 
 let movies = [
   {
@@ -46,29 +50,47 @@ let movies = [
   },
 ];
 
-let requestTime = (req, res, next) => {
-  req.requestTime = Date.now();
-  next();
-};
-
-app.use(requestTime);
-
 app.use(morgan("common"));
 
 app.get("/", (req, res) => {
-  let responseText = "Welcome to my app!\n";
-  responseText += "<small>Requested at: " + requestTime + "</small>";
-  res.send(responseText);
+  res.send("Welcome to my app!\n");
 });
 
+// Gets the list of data about all movies
 app.get('/movies', (req, res) => {
   res.json(movies);
 });
 
-app.get("/secreturl", (req, res) => {
-  let responseText = "This is a secret url with super top-secret content.";
-  responseText += "<small>Requested at: " + requestTime + "</small>";
-  res.send(responseText);
+// Gets the data about a single movie, by title
+app.get("/movies/:title", (req, res) => {
+  res.json(movies.find((movie) =>
+  { return movie.title === req.params.title }));
+});
+
+// Adds data for a new movie to our list of movies
+app.post('/movies', (req, res) => {
+  let newMovie = req.body;
+
+  if (!newMovie.title) {
+    const message = 'Missing title in request body';
+    res.status(400).send(message);
+  } else {
+    newMovie.id = uuid.v4();
+    movies.push(newMovie);
+    res.status(201).send(newMovie);
+  }
+});
+
+// Deletes a movie from our list by title
+app.delete('/movies/:title', (req, res) => {
+  let movies = movies.find((movie) =>
+  { return movie.title === req.params.title });
+
+  if (movies) {
+    movies = movies.filter((obj) =>
+    { return obj.title !== req.params.title });
+    res.status(201).send('Movie ' + req.params.title + ' was deleted.');
+  }
 });
 
 app.use(express.static("public"));
