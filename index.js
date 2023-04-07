@@ -16,14 +16,9 @@ let movies = [
     year: 2001
   },
   {
-    title: "Inception",
-    director: "Christopher Nolan",
-    year: 2010
-  },
-  {
-    title: "Matrix",
-    director: "The Wachowskis",
-    year: 1999
+    title: "The Last Samurai",
+    director: "Edward Zwick",
+    year: 2004
   },
   {
     title: "The Dark Knight",
@@ -31,14 +26,24 @@ let movies = [
     year: 2008
   },
   {
+    title: "Interstellar",
+    director: "Christopher Nolan",
+    year: 2014
+  },
+  {
+    title: "Matrix",
+    director: "The Wachowskis",
+    year: 1999
+  },
+  {
     title: "Star Wars",
     director: "George Lucas",
     year: 1997
   },
   {
-    title: "Interstellar",
+    title: "Inception",
     director: "Christopher Nolan",
-    year: 2014
+    year: 2010
   },
   {
     title: "The Green Mile",
@@ -54,11 +59,6 @@ let movies = [
     title: "Gladiator",
     director: "Ridley Scott",
     year: 2000
-  },
-  {
-    title: "The Last Samurai",
-    director: "Edward Zwick",
-    year: 2004
   },
 ];
 
