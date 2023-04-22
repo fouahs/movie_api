@@ -2,72 +2,20 @@ const express = require("express"),
     bodyParser = require("body-parser"),
     uuid = require("uuid"),
     morgan = require("morgan"),
-    mongoose = require('mongoose'),
-    Models = require('./models.js');
-
-const Movies = Models.Movie;
-const Users = Models.User;
-
-mongoose.connect('mongodb://localhost:27017/myFlixDB', { useNewUrlParser: true, useUnifiedTopology: true });
+    mongoose = require("mongoose"),
+    Models = require("./models.js");
 
 const app = express();
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(morgan("common"));
 
-let movies = [
-  {
-    title: "The Lord of the Rings",
-    director: "Peter Jackson",
-    year: 2001
-  },
-  {
-    title: "The Last Samurai",
-    director: "Edward Zwick",
-    year: 2004
-  },
-  {
-    title: "The Dark Knight",
-    director: "Christopher Nolan",
-    year: 2008
-  },
-  {
-    title: "Interstellar",
-    director: "Christopher Nolan",
-    year: 2014
-  },
-  {
-    title: "Matrix",
-    director: "The Wachowskis",
-    year: 1999
-  },
-  {
-    title: "Star Wars",
-    director: "George Lucas",
-    year: 1997
-  },
-  {
-    title: "Inception",
-    director: "Christopher Nolan",
-    year: 2010
-  },
-  {
-    title: "The Green Mile",
-    director: "Frank Darabont",
-    year: 1999
-  },
-  {
-    title: "Spirited Away",
-    director: "Hayao Miyazaki",
-    year: 2001
-  },
-  {
-    title: "Gladiator",
-    director: "Ridley Scott",
-    year: 2000
-  },
-];
+const Movies = Models.Movie;
+const Users = Models.User;
+
+mongoose.connect("mongodb://localhost:27017/myFlixDB", { useNewUrlParser: true, useUnifiedTopology: true });
 
 app.get("/", (req, res) => {
   res.send("Welcome to my app!\n");
@@ -77,7 +25,7 @@ app.get("/documentation", (req, res) => {
   res.sendFile('public/documentation.html', { root: __dirname });
 });
 
-app.get('/movies', (req, res) => {
+app.get("/movies", (req, res) => {
   res.json(movies);
 });
 
@@ -94,24 +42,112 @@ app.get("/movies/directors/:name", (req, res) => {
   res.send("Successful GET request returning data on a director.");
 });
 
+// Adding a user
 app.post("/users", (req, res) => {
-  res.send("Successful POST request registering a new user.");
+  Users.findOne({ Username: req.body.Username })
+    .then((user) => {
+      if (user) {
+        return res.status(400).send(req.body.Username + "already exists");
+      } else {
+        Users
+          .create({
+            Username: req.body.Username,
+            Password: req.body.Password,
+            Email: req.body.Email,
+            Birthday: req.body.Birthday
+          })
+          .then((user) =>{res.status(201).json(user) })
+          .catch((error) => {
+            console.error(error);
+            res.status(500).send('Error: ' + error);
+          })
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error: " + error);
+    });
 });
 
-app.put("/users/:username", (req, res) => {
-  res.send("Successful PUT request updating a users's info.");
+// Getting all users
+app.get("/users", (req, res) => {
+  Users.find()
+    .then((users) => {
+      res.status(201).json(users);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error: " + err);
+    });
 });
 
-app.post("/users/:username/favorites", (req, res) => {
-  res.send("Successful POST request adding a movie to a user's list of favorites.");
+// Getting a user by username
+app.get("/users/:Username", (req, res) => {
+  Users.findOne({ Username: req.params.Username })
+    .then((user) => {
+      res.json(user);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error: " + err);
+    });
+});
+
+// Updating a user's info, by username
+app.put("/users/:Username", (req, res) => {
+  Users.findOneAndUpdate({ Username: req.params.Username }, { $set:
+      {
+        Username: req.body.Username,
+        Password: req.body.Password,
+        Email: req.body.Email,
+        Birthday: req.body.Birthday
+      }
+    },
+    { new: true }, // This line makes sure that the updated document is returned
+    (err, updatedUser) => {
+      if(err) {
+        console.error(err);
+        res.status(500).send("Error: " + err);
+      } else {
+        res.json(updatedUser);
+      }
+    });
+});
+
+// Adding a movie to a user's list of favorites
+app.post("/users/:Username/movies/:MovieID", (req, res) => {
+  Users.findOneAndUpdate({ Username: req.params.Username }, {
+      $push: { FavoriteMovies: req.params.MovieID }
+    },
+    { new: true }, // This line makes sure that the updated document is returned
+    (err, updatedUser) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send("Error: " + err);
+      } else {
+        res.json(updatedUser);
+      }
+    });
 });
 
 app.delete("/users/:username/favorites", (req, res) => {
   res.send("Successful DELETE request removing a movie from a user's list of favorites.");
 });
 
-app.delete("/users", (req, res) => {
-  res.send("Successful DELETE request deregistering a user.");
+// Deleting a user by username
+app.delete("/users/:Username", (req, res) => {
+  Users.findOneAndRemove({ Username: req.params.Username })
+    .then((user) => {
+      if (!user) {
+        res.status(400).send(req.params.Username + " was not found");
+      } else {
+        res.status(200).send(req.params.Username + " was deleted.");
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error: " + err);
+    });
 });
 
 app.use(express.static("public"));
