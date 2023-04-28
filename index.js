@@ -22,28 +22,67 @@ app.get("/", (req, res) => {
 });
 
 app.get("/documentation", (req, res) => {
-  res.sendFile('public/documentation.html', { root: __dirname });
+  res.sendFile("public/documentation.html", { root: __dirname });
 });
 
 // Returning a list of all movies
 app.get("/movies", (req, res) => {
-  res.json(movies);
+  Movies.find()
+    .then((movies) => {
+      res.status(200).json(movies);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error: " + err);
+    });
 });
 
 // Returning data about a single movie by title
-app.get("/movies/:title", (req, res) => {
-  res.json(movies.find((movie) =>
-  { return movie.title === req.params.title }));
+app.get("/movies/:Title", (req, res) => {
+  Movies.findOne({ Title: req.params.Title })
+    .then((movie) => {
+      if (!movie) {
+        return res.status(400).send(req.params.Title + " was not found");
+      } else {
+        res.status(200).json(movie);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error: " + err);
+    });
 });
 
 // Returning data about a genre by name/title
-app.get("/movies/genres/:name", (req, res) => {
-  res.send("Successful GET request returning data on a genre.");
+app.get("/movies/genres/:Name", (req, res) => {
+  Movies.findOne({ "Genre.Name": req.params.Name })
+    .then((movie) => {
+      if (!movie) {
+        return res.status(400).send(req.params.Name + " was not found");
+      } else {
+        res.status(200).json(movie.Genre.Description);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error: " + err);
+    });
 });
 
 // Returning data about a director by name
-app.get("/movies/directors/:name", (req, res) => {
-  res.send("Successful GET request returning data on a director.");
+app.get("/movies/directors/:Name", (req, res) => {
+  Movies.findOne({ "Director.Name": req.params.Name })
+    .then((movie) => {
+      if (!movie) {
+        return res.status(400).send(req.params.Name + " was not found");
+      } else {
+        res.status(200).json(movie.Director);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error: " + err);
+    });
 });
 
 // Adding a user
@@ -111,8 +150,19 @@ app.post("/users/:Username/movies/:MovieID", (req, res) => {
 });
 
 // Removing a movie from a user's list of favorites
-app.delete("/users/:username/favorites", (req, res) => {
-  res.send("Successful DELETE request removing a movie from a user's list of favorites.");
+app.delete("/users/:Username/movies/:MovieID", (req, res) => {
+  Users.findOneAndUpdate({ Username: req.params.Username }, {
+      $pull: { FavoriteMovies: req.params.MovieID }
+    },
+    { new: true }, // This line makes sure that the updated document is returned
+    (err, updatedUser) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send("Error: " + err);
+      } else {
+        res.json(updatedUser);
+      }
+    });
 });
 
 // Deleting a user by username
