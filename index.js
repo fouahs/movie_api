@@ -25,19 +25,23 @@ app.get("/documentation", (req, res) => {
   res.sendFile('public/documentation.html', { root: __dirname });
 });
 
+// Returning a list of all movies
 app.get("/movies", (req, res) => {
   res.json(movies);
 });
 
+// Returning data about a single movie by title
 app.get("/movies/:title", (req, res) => {
   res.json(movies.find((movie) =>
   { return movie.title === req.params.title }));
 });
 
+// Returning data about a genre by name/title
 app.get("/movies/genres/:name", (req, res) => {
   res.send("Successful GET request returning data on a genre.");
 });
 
+// Returning data about a director by name
 app.get("/movies/directors/:name", (req, res) => {
   res.send("Successful GET request returning data on a director.");
 });
@@ -66,30 +70,6 @@ app.post("/users", (req, res) => {
     .catch((error) => {
       console.error(error);
       res.status(500).send("Error: " + error);
-    });
-});
-
-// Getting all users
-app.get("/users", (req, res) => {
-  Users.find()
-    .then((users) => {
-      res.status(201).json(users);
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).send("Error: " + err);
-    });
-});
-
-// Getting a user by username
-app.get("/users/:Username", (req, res) => {
-  Users.findOne({ Username: req.params.Username })
-    .then((user) => {
-      res.json(user);
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).send("Error: " + err);
     });
 });
 
@@ -130,6 +110,7 @@ app.post("/users/:Username/movies/:MovieID", (req, res) => {
     });
 });
 
+// Removing a movie from a user's list of favorites
 app.delete("/users/:username/favorites", (req, res) => {
   res.send("Successful DELETE request removing a movie from a user's list of favorites.");
 });
