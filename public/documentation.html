@@ -58,38 +58,36 @@
       <td>Allow new users to register</td>
       <td>/users</td>
       <td>POST</td>
-      <td>A JSON object holding data about the user</td>
-      <td>A text message indicating whether the user has successfully registered</td>
+      <td>A JSON object holding data about the user to be added</td>
+      <td>A JSON object holding data about the user that was added</td>
     </tr>
     <tr>
       <td>Allow users to update their user info</td>
       <td>users/[username]</td>
       <td>PUT</td>
       <td>A JSON object holding the updated data about the user</td>
-      <td>A text message indicating whether the user info was successfully updated</td>
+      <td>A JSON object holding the updated data about the user</td>
     </tr>
     <tr>
       <td>Allow users to add a movie to their list of favorites</td>
-      <td>users/[username]/favorites</td>
+      <td>users/[username]/movies/[movieID]</td>
       <td>POST</td>
-      <td>A JSON object holding data about the movie to add</td>
-      <td>A text message indicating whether the movie was successfully added
-        from the list of favorites</td>
+      <td>None</td>
+      <td>A JSON object holding the updated data about the user's favorite movies</td>
     </tr>
     <tr>
       <td>Allow users to remove a movie from their list of favorites</td>
-      <td>users/[username]/favorites</td>
+      <td>users/[username]/movies/[movieID]</td>
       <td>DELETE</td>
-      <td>A JSON object holding data about the movie to remove</td>
-      <td>A text message indicating whether the movie was successfully removed
-        from the list of favorites</td>
+      <td>None</td>
+      <td>A JSON object holding the updated data about the user's favorite movies</td>
     </tr>
     <tr>
       <td>Allow existing users to deregister</td>
       <td>/users</td>
       <td>DELETE</td>
+      <td>None</td>
       <td>A text message indicating whether the user has successfully deregistered</td>
-      <td></td>
     </tr>
   </table>
 
