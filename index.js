@@ -5,6 +5,8 @@ const express = require("express"),
     mongoose = require("mongoose"),
     Models = require("./models.js");
 
+const { check, validationResult } = require("express-validator");
+
 const Movies = Models.Movie;
 const Users = Models.User;
 
@@ -94,7 +96,22 @@ app.get("/movies/directors/:Name", passport.authenticate("jwt", { session: false
 });
 
 // Adding a user
-app.post("/users", (req, res) => {
+app.post("/users",
+  [
+    check("Username", "Username is required").isLength({min: 5}),
+    check("Username", "Username contains non alphanumeric characters - not allowed.").isAlphanumeric(),
+    check("Password", "Password is required").not().isEmpty(),
+    check("Email", "Email does not appear to be valid").isEmail()
+  ],
+  (req, res) => {
+
+    let errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array()
+      });
+    }
+
   let hashedPassword = Users.hashPassword(req.body.Password);
   Users.findOne({ Username: req.body.Username })
     .then((user) => {
@@ -122,8 +139,24 @@ app.post("/users", (req, res) => {
 });
 
 // Updating a user's info, by username
-app.put("/users/:Username", passport.authenticate("jwt", { session: false }), (req, res) => {
-  Users.findOneAndUpdate({ Username: req.params.Username }, { $set:
+app.put("/users/:Username",
+    passport.authenticate("jwt", { session: false }),
+    [
+      check("Username", "Username is required").isLength({min: 5}),
+      check("Username", "Username contains non alphanumeric characters - not allowed.").isAlphanumeric(),
+      check("Password", "Password is required").not().isEmpty(),
+      check("Email", "Email does not appear to be valid").isEmail()
+    ],
+    (req, res) => {
+
+      let errors = validationResult(req);
+
+      if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array()
+        });
+      }
+
+      Users.findOneAndUpdate({ Username: req.params.Username }, { $set:
       {
         Username: req.body.Username,
         Password: req.body.Password,
