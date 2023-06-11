@@ -2,3 +2,4 @@
 node_modules/
 /movies.json
 /users.json
+.parcel-cache
