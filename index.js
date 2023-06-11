@@ -23,7 +23,7 @@ const cors = require('cors');
 let allowedOrigins = [
   "http://localhost:1234",
   "http://localhost:40051",
-  "https://myflix-tkr4.onrender.com/"
+  "https://myflix-tkr4.onrender.com"
 ];
 
 app.use(cors({
